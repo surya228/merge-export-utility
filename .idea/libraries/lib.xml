@@ -1,0 +1,20 @@
+<component name="libraryTable">
+  <library name="lib">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/slf4j-simple-1.6.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/org.apache.commons.io.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/zipdiff.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/oraclepki-5.0.0-180614.0305.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/osdt_core-5.0.0-180614.0305.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/slf4j-api-1.6.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/ojdbc17.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/oraclepki.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/ojdbc11.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/liquibase.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/ojdbc8-12.2.0.1.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/osdt_cert-5.0.0-180614.0305.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

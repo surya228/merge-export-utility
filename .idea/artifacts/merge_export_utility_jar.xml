@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="merge-export-utility:jar">
+    <output-path>$PROJECT_DIR$/../../2. Utility/merge-export-utility/lib</output-path>
+    <root id="archive" name="merge-export-utility.jar">
+      <element id="module-output" name="merge-export-utility" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/ojdbc11.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/oraclepki.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
