@@ -1,7 +1,6 @@
 package com.oracle.fccm.amllite.scripts.pipeline.mergegenerator;
 
 import com.oracle.fccm.amllite.scripts.pipeline.util.Constants;
-
 import java.io.*;
 import java.sql.Clob;
 import java.sql.Connection;
@@ -13,7 +12,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Properties;
@@ -72,11 +70,10 @@ public class Merge
 //      String walletPath = Constants.PARENT_DIRECTORY+File.separator+"bin"+File.separator+props.getProperty("WALLET_NAME");
       conn = getDbConnection(props);
       meta = conn.getMetaData();
-      String querymain = "select table_name from user_tables where table_name IN  ('"+props.getProperty("TABLE_NAME")+"') order by 1";
+      String schema = props.getProperty("SCHEMA").trim().toUpperCase();
+      String querymain = "select table_name from all_tables where owner = '" + schema + "' and table_name IN ('"+props.getProperty("TABLE_NAME")+"') order by 1";
       Statement tablemain = conn.createStatement();
       System.out.println(querymain);
-//      String version = "v0";
-      //String version = "";
       ResultSet tablemainresult = tablemain.executeQuery(querymain);
       ArrayList<String> arrlist = new ArrayList<String>();
       while (tablemainresult.next()) {
@@ -93,18 +90,18 @@ public class Merge
           StringBuffer selectCondition = new StringBuffer();
           StringBuffer insertQuery = new StringBuffer();
           File fout = null;
-	  
-      String table = tablemainresult.getString("table_name");
-      System.out.println("Table Name :- "+ table);
+
+          String table = tablemainresult.getString("table_name");
+          System.out.println("Schema: " + schema + ", Table Name: "+ table);
       HashMap<String, String> pColumns = new HashMap();
       SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
       
-      fout = new File(Constants.OUTPUT_FOLDER + File.separator + table+ ".sql");
+      fout = new File(Constants.OUTPUT_FOLDER + File.separator + schema + "_" + table+ ".sql");
       openWriteFile(fout);
       
       System.out.println("Retrieving the primary keys for the table");
       Statement tableStatement = conn.createStatement();
-      String query1 = "select t.column_name from user_cons_columns t where t.constraint_name in (select f.constraint_name from user_constraints f where f.CONSTRAINT_TYPE = 'P' and f.TABLE_NAME = '" + table.trim().toUpperCase() + "')";
+      String query1 = "select t.column_name from all_cons_columns t where t.owner = '" + schema + "' and t.constraint_name in (select f.constraint_name from all_constraints f where f.owner = '" + schema + "' and f.CONSTRAINT_TYPE = 'P' and f.TABLE_NAME = '" + table.trim().toUpperCase() + "')";
       ResultSet tableResultSet = tableStatement.executeQuery(query1);
       HashMap<String, String> keys = new HashMap();
       while (tableResultSet.next())
@@ -124,12 +121,12 @@ public class Merge
       statement = conn.createStatement();
       condition = " "+props.getProperty("WHERE_CONDITION")+" ";
       if ((condition != null) && (!"".equals(condition))) {
-        System.out.println("Query executing:SELECT * FROM " + table + " where " + condition );
-        resultSet = statement.executeQuery("SELECT * FROM " + table + " where " + condition);
+        System.out.println("Query executing:SELECT * FROM " + schema + "." + table + " where " + condition );
+        resultSet = statement.executeQuery("SELECT * FROM " + schema + "." + table + " where " + condition);
       }
       else
       {
-         resultSet = statement.executeQuery("SELECT * FROM " + table);
+         resultSet = statement.executeQuery("SELECT * FROM " + schema + "." + table);
       }
       metadata = resultSet.getMetaData();
       columnCount = metadata.getColumnCount();
@@ -164,8 +161,8 @@ public class Merge
         {
           conditionCount = 1;
           boolean dateField = false;
-          insertQuery.append(" INTO " + table + " (");
-          selectCondition.append("SELECT COUNT(*) FROM " + table + " where ");
+          insertQuery.append(" INTO " + schema + "." + table + " (");
+          selectCondition.append("SELECT COUNT(*) FROM " + schema + "." + table + " where ");
           column = 1;
           for (String columnName3 : columns) {
             if (column == 1)
@@ -247,7 +244,7 @@ public class Merge
           column = 1;
           
           
-          query.append("MERGE INTO " + table.toUpperCase() + " T USING ( \n SELECT ");
+          query.append("MERGE INTO " + schema + "." + table.toUpperCase() + " T USING ( \n SELECT ");
           for (columnName1 = columns.iterator(); ((Iterator)columnName1).hasNext();)
           {
             String columnName21 = (String)((Iterator)columnName1).next();
@@ -351,9 +348,10 @@ public class Merge
       resultSet.close();
       statement.close();
       closeWriteFile();
-      arrlist.add(table);      
+      arrlist.add(table);
       }
-      
+      tablemainresult.close();
+      tablemain.close();
       //CreateChangeLogFile  changelog = new CreateChangeLogFile();
       //changelog.changelogfile(arrlist,version);
       conn.close();
@@ -476,4 +474,3 @@ public class Merge
     return tables.split(",");
   }
 }
-
